@@ -146,7 +146,7 @@
           <tbody>
             <tr>
               <td>Text</td>
-              <td>content, role?, finishReason?</td>
+              <td>content, role?, finishReason?, reasoning?, webSearches?</td>
               <td>Plain text response</td>
             </tr>
             <tr>
@@ -166,6 +166,67 @@
             </tr>
           </tbody>
         </table>
+
+        <h2>Reasoning &amp; Web Searches</h2>
+
+        <p>
+          Text responses support two optional fields that simulate advanced LLM features:
+          <code>reasoning</code> for chain-of-thought reasoning, and <code>webSearches</code> for
+          web search tool calls.
+        </p>
+
+        <table class="endpoint-table">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>reasoning</td>
+              <td>string</td>
+              <td>
+                When set, aimock streams <code>reasoning_content</code> chunks (for Chat
+                Completions) or reasoning events (for Responses API) before the main content. This
+                simulates OpenAI's reasoning/thinking feature.
+              </td>
+            </tr>
+            <tr>
+              <td>webSearches</td>
+              <td>string[]</td>
+              <td>
+                When set, aimock emits <code>web_search_call</code> events (Responses API only)
+                before the main content. Each string is a search query. Not supported in Chat
+                Completions or Claude Messages API.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            reasoning-and-search.ts <span class="lang-tag">ts</span>
+          </div>
+          <pre><code><span class="op">mock</span>.<span class="fn">addFixture</span>({
+  <span class="prop">match</span>: { <span class="prop">userMessage</span>: <span class="str">/research/</span> },
+  <span class="prop">response</span>: {
+    <span class="prop">content</span>: <span class="str">"Based on my research..."</span>,
+    <span class="prop">reasoning</span>: <span class="str">"Let me think step by step about this question."</span>,
+    <span class="prop">webSearches</span>: [<span class="str">"relevant topic query"</span>, <span class="str">"supporting data query"</span>],
+  },
+});</code></pre>
+        </div>
+
+        <div class="info-box">
+          <p>
+            <strong>Provider support:</strong> <code>reasoning</code> works across Chat Completions,
+            Responses API, and all providers that support reasoning tokens.
+            <code>webSearches</code> is Responses API only &mdash; it is silently ignored by Chat
+            Completions and Claude Messages API.
+          </p>
+        </div>
 
         <h2>Fixture Options</h2>
 
